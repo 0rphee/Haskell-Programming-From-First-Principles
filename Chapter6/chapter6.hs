@@ -21,7 +21,7 @@ instance Eq Date where
 
 -- Exercsices: Eq Instances
 -- 1.
-data TisAnInteger = TisAn Integer 
+newtype TisAnInteger = TisAn Integer
     deriving Show
 instance Eq TisAnInteger where
     (==) (TisAn int) (TisAn int') = int == int'
@@ -34,7 +34,7 @@ instance Eq TwoIntegers where
          int1 == int1' && int2 == int2'
 
 -- 3.
-data StringOrInt = TisAnInt Int 
+data StringOrInt = TisAnInt Int
                  | TisAString String
 instance Eq StringOrInt where
     (==) (TisAnInt int) (TisAnInt int')     = int == int'
@@ -44,7 +44,7 @@ instance Eq StringOrInt where
 -- 4.
 data Pair a = Pair a a
 instance Eq a => Eq (Pair a) where
-    (==) (Pair a1 a2) (Pair a1' a2') 
+    (==) (Pair a1 a2) (Pair a1' a2')
          = a1 == a1' && a2 == a2'
 
 -- 5.
@@ -54,7 +54,7 @@ instance (Eq a, Eq b) => Eq (Tuple a b) where
          a == a' && b == b'
 
 -- 6.
-data Which a = ThisOne a 
+data Which a = ThisOne a
              | ThatOne a
 instance (Eq a) => Eq (Which a) where
     (==) (ThisOne a) (ThisOne a') = a == a'
@@ -72,3 +72,35 @@ instance (Eq a, Eq b) => Eq (EitherOr a b) where
 
 -- Working with Show
 data Mood = Blah deriving Show
+
+-- 6.14 Chapter Exercises
+-- Does it typechek?
+-- 4.
+type Subject = String
+type Verb = String
+type Object = String
+
+data Sentence = Sentence Subject Verb Object
+                deriving (Eq, Show)
+s1 = Sentence "dogs" "drool" -- turns into a "function" of sorts
+s2 = Sentence "Julie" "loves" "dogs" -- an actual value
+
+-- Given a datatype declaration, what can we do?
+newtype Rocks = Rocks String deriving (Eq, Show)
+newtype Yeah = Yeah Bool deriving (Eq, Show)
+
+data Papu = Papu Rocks Yeah deriving (Eq, Show)
+phew = Papu (Rocks "chases") (Yeah True)
+
+equalityForall :: Papu -> Papu -> Bool
+equalityForall p p' = p == p'
+
+-- Type-Kwon-Do Two: Electric Typealoo
+-- 1.
+chk :: Eq b => (a -> b) -> a -> b -> Bool
+chk arg mag tag = arg mag == tag
+
+--2. 
+arith :: Num b =>
+        (a -> b) -> Integer -> a -> b
+arith tup int third = tup third + fromInteger int
