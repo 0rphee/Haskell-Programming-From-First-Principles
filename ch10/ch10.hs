@@ -1,4 +1,6 @@
 import Data.Time
+import Data.Time.Calendar.OrdinalDate (fromMondayStartWeek)
+import Data.Time.Calendar.WeekDate (fromWeekDate)
 --Folds
 myfold :: [String] -> String
 myfold = foldl (\prev next -> prev ++ take 3 next) ""
@@ -18,6 +20,7 @@ theDatabase = [DbDate (UTCTime
                , DbString "Hello, World"
                , DbDate (UTCTime (fromGregorian 1921 5 1)
                                  (secondsToDiffTime 34123))
+               , DbNumber 1000
                ]
 
 filt :: (t -> [a]) -> [a] -> t -> [a]
@@ -44,9 +47,18 @@ filterDbString = foldl filtString []
                                     _          -> [] )
 
 mostRecent :: [DatabaseItem] -> UTCTime
-mostRecent dbItems = foldl1 max [] times
+mostRecent dbItems = foldl max baseCase times
     where times = filterDbDate dbItems
           baseCase = UTCTime
-                        (fromGregorian 1911 5 1)
-                        (secondsToDiffTime 34123)
+                        (fromWeekDate 1900 1 1)
+                        (secondsToDiffTime 0)
+
+sumDb :: [DatabaseItem] -> Integer  
+sumDb dbItems = foldl (+) 0 times
+    where times = filterDbNumber dbItems
+
+avgDb :: [DatabaseItem] -> Double 
+avgDb dbItems = sumResult / len
+    where sumResult = fromInteger $ sumDb dbItems 
+          len = fromIntegral $ length (filterDbNumber dbItems)
 
