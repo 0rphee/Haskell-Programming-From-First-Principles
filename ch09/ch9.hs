@@ -1,5 +1,6 @@
 import Data.Char
 
+-- List comprehension examples
 acron :: [Char] -> [Char]
 acron xs = [x | x <- xs, x `elem` ['A'..'Z']]
 
