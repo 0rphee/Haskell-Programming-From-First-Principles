@@ -1,3 +1,4 @@
+import Data.List (sort)
 -- Algebraic datatypes
 -- newtype
 -- {-# LANGUAGE GeneralizedNewtypeDeriving #-} to derive all typeclasses
@@ -62,14 +63,14 @@ isDairyFarmer = isSthFarmer DairyFarmer
 
 bookIsDairyFarmer :: Farmer -> Bool
 bookIsDairyFarmer (Farmer _ _ DairyFarmer) = True
-bookIsDairyFarmer _                        = False 
+bookIsDairyFarmer _                        = False
 
 data FarmerRec = FarmerRec {name :: Name,
                             acres :: Acres,
                             farmerType :: FarmerType}
 
 isDairyFarmerRec farmer = case farmerType farmer of
-                          DairyFarmer -> True 
+                          DairyFarmer -> True
                           _           -> False
 
 -- 11.14 Function type is exponential
@@ -85,11 +86,11 @@ quantSum2 :: Either Quantum Quantum
 quantSum2 = Right No
 quantSum3 :: Either Quantum Quantum
 quantSum3 = Right Both
-quantSum4 :: Either Quantum Quantum 
+quantSum4 :: Either Quantum Quantum
 quantSum4 = Left Yes
-quantSum5 :: Either Quantum Quantum 
+quantSum5 :: Either Quantum Quantum
 quantSum5 = Left No
-quantSum6 :: Either Quantum Quantum 
+quantSum6 :: Either Quantum Quantum
 quantSum6 = Left Both
 
 -- 3 * 3
@@ -193,8 +194,91 @@ instance (Show a) => Show (List a) where
 
 -- 11.17 Binary Tree
 data BinaryTree a = Leaf
-                  | Node (BinaryTree a) a (BinaryTree a) 
+                  | Node (BinaryTree a) a (BinaryTree a)
                   deriving (Eq,Ord)
 instance (Show a) => Show (BinaryTree a) where
     show Leaf = " "
     show (Node a b c) = "<" ++ show a ++ "("++show b++")"++show c++">"
+
+insert' :: Ord a => a -> BinaryTree a -> BinaryTree a
+insert' b Leaf = Node Leaf b Leaf
+insert' b (Node left a right)
+    | b == a = Node left a right
+    | b < a = Node (insert' b left) a right
+    | b > a = Node left a (insert' b right)
+
+-- Write map for BinaryTree
+mapTree :: (a -> b) -> BinaryTree a -> BinaryTree b
+mapTree _ Leaf = Leaf
+mapTree f (Node left a right) =
+    Node (mapTree f left) (f a) (mapTree f right)
+
+customOp :: (Ord a, Num a) => a -> a
+customOp x
+    | x < 5 = x + 5
+    | otherwise = x -1
+
+-- Convert binary trees to lists
+preorder :: BinaryTree a -> [a]
+preorder Leaf = []
+preorder (Node left a right) = a : preorder left ++ preorder right
+
+inorder :: Ord a => BinaryTree a -> [a]
+inorder = sort . preorder
+
+postorder :: BinaryTree a -> [a]
+postorder = reverse . preorder
+
+testTree :: BinaryTree Integer
+testTree = Node
+    (Node Leaf 1 Leaf) 2 (Node Leaf 3 Leaf)
+
+testPreorder :: IO ()
+testPreorder = if preorder testTree == [2, 1, 3]
+               then putStrLn "Preorder fine!"
+               else putStrLn "Bad news bears."
+
+testInorder :: IO ()
+testInorder = if inorder testTree == [1, 2, 3]
+              then putStrLn "Inorder fine!"
+              else putStrLn "Bad news bears."
+
+foldTree :: (a -> b -> b) -> b -> BinaryTree a
+            -> b
+foldTree _ base Leaf = base
+foldTree f base (Node left a right) = undefined
+
+-- Chapter Exercises
+vigenere :: Char -> Char -> Char
+vigenere letter keyletter 
+    | letter == ' ' = letter
+    | keyletter == 'a' = letter
+    | dist > rightLimit = toEnum (aEnum + dist - rightLimit)
+    | otherwise = toEnum (originInt + dist)
+    where aEnum = fromEnum 'a'   
+          originInt = fromEnum letter
+          rightLimit = fromEnum 'z' + 1 - originInt 
+          dist = fromEnum keyletter - aEnum
+
+encodeVig :: [Char] -> [Char] -> [Char]
+encodeVig word code = zipWith vigenere word arrangedCode
+    where cycledCode = take (length word) (cycle code)
+          arrangedCode = lookupWord word cycledCode
+
+lookupWord :: [Char] -> [Char] -> [Char]
+lookupWord [] _ = []
+lookupWord _ [] = []
+lookupWord (x:xs) (y:ys)
+    | x /= ' '  = y : lookupWord xs ys
+    | otherwise = ' ' : lookupWord xs (y:ys)
+
+-- As-pattens: pattern match on part of something and 
+-- still refer to the entire original value.
+f :: Show a => (a,b) -> IO (a,b)
+f t@(a,_) = do
+    print a
+    return t
+
+doubleUp :: [a] -> [a] 
+doubleUp [] = []
+doubleUp xs@(x:_) = x : xs
