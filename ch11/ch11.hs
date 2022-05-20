@@ -1,4 +1,5 @@
-import Data.List (sort)
+import Data.List (sort, elemIndices, find)
+import Data.Char (isUpper, toLower)
 -- Algebraic datatypes
 -- newtype
 -- {-# LANGUAGE GeneralizedNewtypeDeriving #-} to derive all typeclasses
@@ -250,14 +251,14 @@ foldTree f base (Node left a right) = undefined
 
 -- Chapter Exercises
 vigenere :: Char -> Char -> Char
-vigenere letter keyletter 
+vigenere letter keyletter
     | letter == ' ' = letter
     | keyletter == 'a' = letter
     | dist > rightLimit = toEnum (aEnum + dist - rightLimit)
     | otherwise = toEnum (originInt + dist)
-    where aEnum = fromEnum 'a'   
+    where aEnum = fromEnum 'a'
           originInt = fromEnum letter
-          rightLimit = fromEnum 'z' + 1 - originInt 
+          rightLimit = fromEnum 'z' + 1 - originInt
           dist = fromEnum keyletter - aEnum
 
 encodeVig :: [Char] -> [Char] -> [Char]
@@ -273,12 +274,50 @@ lookupWord (x:xs) (y:ys)
     | otherwise = ' ' : lookupWord xs (y:ys)
 
 -- As-pattens: pattern match on part of something and 
--- still refer to the entire original value.
+-- still refer to the entire original value. Uses @
 f :: Show a => (a,b) -> IO (a,b)
 f t@(a,_) = do
     print a
     return t
 
-doubleUp :: [a] -> [a] 
+doubleUp :: [a] -> [a]
 doubleUp [] = []
 doubleUp xs@(x:_) = x : xs
+
+-- Phone exercise
+type Digit   = Char
+type Presses = Int
+
+data KeyLayout = MkKey {key :: Digit,
+                        chars :: [Char]}
+newtype Phone = MkPhone [KeyLayout]
+
+daPhone = MkPhone [MkKey '1' "1" ,MkKey '2' "abc2",MkKey '3' "def3",
+                   MkKey '4' "ghi4",MkKey '5' "jkl5",MkKey '6' "mno6",
+                   MkKey '7' "pqrs7",MkKey '8' "tuv8",MkKey '9' "wxyz9",
+                   MkKey '*' "*^",MkKey '0' "+ 0",MkKey '#' ".,#"]
+
+
+calcPresses :: Digit -> KeyLayout -> Presses
+calcPresses _ (MkKey _ []) = 0
+calcPresses char (MkKey button l) = x + 1
+    where (x:_) = elemIndices char l
+
+hasKey :: Char -> KeyLayout -> Bool
+hasKey char (MkKey _ digits) = char `elem` digits
+
+reverseTapChar :: Phone -> Char -> [(Digit, Presses)]
+reverseTapChar (MkPhone listy) char = case returnedKey of
+                                   Nothing -> [(' ',0)]
+                                   Just key@(MkKey digit chars) -> capKey ++ [(digit, calcPresses lowerChar key)]
+    where returnedKey = find (hasKey lowerChar) listy :: Maybe KeyLayout
+          capKey = if isUpper char
+                   then [('*',calcPresses '*' (MkKey '*' "*^"))]
+                   else []
+          lowerChar = toLower char
+
+strToTaps :: [Char] -> [(Digit, Presses)]
+strToTaps = concatMap (reverseTapChar daPhone)
+
+fingerTaps :: [(Digit, Presses)] -> Presses
+fingerTaps listy = sum $ map snd listy 
