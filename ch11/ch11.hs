@@ -321,3 +321,6 @@ strToTaps = concatMap (reverseTapChar daPhone)
 
 fingerTaps :: [(Digit, Presses)] -> Presses
 fingerTaps listy = sum $ map snd listy 
+
+tapsOfStr :: [Char] -> Presses
+tapsOfStr =  fingerTaps . strToTaps
