@@ -320,7 +320,22 @@ strToTaps :: [Char] -> [(Digit, Presses)]
 strToTaps = concatMap (reverseTapChar daPhone)
 
 fingerTaps :: [(Digit, Presses)] -> Presses
-fingerTaps listy = sum $ map snd listy 
+fingerTaps listy = sum $ map snd listy
 
 tapsOfStr :: [Char] -> Presses
 tapsOfStr =  fingerTaps . strToTaps
+
+-- Hutton's Razor
+data Expr = Lit Integer | Add Expr Expr
+
+instance Show Expr where 
+  show (Lit x) = show x
+  show (Add exp1 exp2) = concat [show exp1," + ",show exp2]
+
+eval :: Expr -> Integer
+eval (Lit x) = x
+eval (Add x y) = eval x + eval y
+
+printExpr :: Expr -> String
+printExpr = show
+
