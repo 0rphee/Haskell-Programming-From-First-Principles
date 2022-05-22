@@ -55,7 +55,7 @@ replaceThe str = unwords (map replaceThe wrds)
                          else x
 isThe = (==) "the"
 
--- a mess
+-- a mess, doesnt compile
 countTheBeforeVowel :: String -> Integer
 countTheBeforeVowel [] = 0
 countTheBeforeVowel str 
