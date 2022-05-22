@@ -1,3 +1,6 @@
+{-# OPTIONS_GHC -Wno-incomplete-patterns #-}
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Use list comprehension" #-}
 import Data.List (sort, elemIndices, find)
 import Data.Char (isUpper, toLower)
 -- Algebraic datatypes
