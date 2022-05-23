@@ -217,3 +217,39 @@ eitherMaybe'' _ (Left _) = Nothing
 eitherMaybe'' f (Right b) = Just (f b)
 
 -- Unfolds 
+-- 1. Write myIterate using direct recursion
+myIterate :: (a -> a) -> a -> [a]
+myIterate f starter = starter : myIterate f next
+    where next = f starter
+
+-- 2. Write myUnfoldr using direct recursion
+myUnfoldr :: (b -> Maybe (a,b)) -> b -> [a]
+myUnfoldr f b = case f b of
+    Nothing -> []
+    Just (a,b) -> a : myUnfoldr f b
+
+-- 3. Rewrite myIterate into betterIterate using myUnfoldr
+betterIterate :: (a -> a) -> a -> [a]
+betterIterate f = myUnfoldr (\b -> Just (b, f b))
+
+-- Finally something other than a list!
+
+data BinaryTree a = Leaf 
+                  | Node (BinaryTree a) a (BinaryTree a)
+                    deriving (Eq,Ord,Show)
+
+unfoldBTree :: (a -> Maybe (a,b,a)) -> a -> BinaryTree b
+unfoldBTree f starter = case f starter of
+    Nothing -> Leaf
+    Just (l,n,r) -> Node (unfoldBTree f l) n (unfoldBTree f r) 
+
+unfoldBTreeTest :: BinaryTree Int
+unfoldBTreeTest = unfoldBTree (\a -> if a<4
+                          then Just (a+1,a,a+2)
+                          else Nothing) 0
+
+-- 2. Make a tree builder
+treeBuild :: Integer -> BinaryTree Integer
+treeBuild n = unfoldBTree (\a -> if a<n
+                                 then Just (a+1,a,a+1)
+                                 else Nothing) 0
