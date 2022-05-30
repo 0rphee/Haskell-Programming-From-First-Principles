@@ -177,7 +177,7 @@ lefts'1 (Right _:xs) = lefts'1 xs
 lefts' :: [Either a b] -> [a]
 lefts' = foldr helper []
     where helper :: Either a b -> [a] -> [a]
-          helper (Left a) next  = [a] ++ next -- without (++) it wont work
+          helper (Left a) next  = a : next
           helper (Right _) next = next
 {- 
 foldr helper [] [Left 1, Right 'a', Left 2]
@@ -190,7 +190,7 @@ Left 1 `helper` (Right 'a' `helper`(Left 2 `helper` []))
 rights' :: [Either a b] -> [b]
 rights' = foldr helper []
     where helper :: Either a b -> [b] -> [b]
-          helper (Right b) next = [b] ++ next -- without (++) it wont work
+          helper (Right b) next = b : next -- without (++) it wont work
           helper (Left _)  next = next
 
 -- 3. partitionEithers'
@@ -234,14 +234,14 @@ betterIterate f = myUnfoldr (\b -> Just (b, f b))
 
 -- Finally something other than a list!
 
-data BinaryTree a = Leaf 
+data BinaryTree a = Leaf
                   | Node (BinaryTree a) a (BinaryTree a)
                     deriving (Eq,Ord,Show)
 
 unfoldBTree :: (a -> Maybe (a,b,a)) -> a -> BinaryTree b
 unfoldBTree f starter = case f starter of
     Nothing -> Leaf
-    Just (l,n,r) -> Node (unfoldBTree f l) n (unfoldBTree f r) 
+    Just (l,n,r) -> Node (unfoldBTree f l) n (unfoldBTree f r)
 
 unfoldBTreeTest :: BinaryTree Int
 unfoldBTreeTest = unfoldBTree (\a -> if a<4
