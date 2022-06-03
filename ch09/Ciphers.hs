@@ -1,4 +1,4 @@
-
+module Ciphers where
 import Data.Char
 
 caesarCycle :: Integral a => Char -> a -> Char
