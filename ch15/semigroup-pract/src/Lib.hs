@@ -55,7 +55,9 @@ twoCheck = quickCheck (semigroupAssoc :: TwoAssoc)
 newtype BoolConj = BoolConj Bool deriving (Eq, Show)
 instance Semigroup BoolConj where
   (BoolConj True) <> (BoolConj True) = BoolConj True
-  (BoolConj _) <> (BoolConj _) = BoolConj False
+  _ <> _                             = BoolConj False
+instance Monoid BoolConj where
+  mempty = BoolConj True
 
 -- 7.
 newtype BoolDisj = BoolDisj Bool deriving (Eq,Show)
@@ -63,6 +65,8 @@ instance Semigroup BoolDisj where
   (BoolDisj True) <> (BoolDisj _) = BoolDisj True
   (BoolDisj _) <> (BoolDisj True) = BoolDisj True
   (BoolDisj _) <> (BoolDisj _) = BoolDisj False
+instance Monoid BoolDisj where
+  mempty = BoolDisj False
 
 -- 8. 
 data Or a b = Fst a | Snd b deriving (Show,Eq)
