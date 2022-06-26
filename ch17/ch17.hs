@@ -85,3 +85,12 @@ instance Monoid a => Applicative (Constant a) where
   pure a = Constant mempty
   (Constant a) <*> (Constant b) = Constant (a <> b)
 
+-- Exercise: Fixer Upper
+-- 1.
+fix1 :: Maybe [Char]
+fix1 = const <$> Just "Hello" <*> Just "World"
+
+fix2 :: Maybe (Integer, Integer, [Char], [Integer])
+fix2 = (,,,) <$> Just 90 <*> Just 10 
+      <*> Just "Tierness" <*> Just [1,2,3]
+
