@@ -63,7 +63,7 @@ p = lookup 3 $ zip hh kk
 q :: Maybe Integer
 q = lookup 3 $ zip hh kk
 
---summed :: Maybe Integer
+summed :: Maybe Integer
 summed = (+) <$> p <*> q
 
 newtype Identity a = Identity a
