@@ -4,6 +4,7 @@ import Data.Monoid
 import Test.QuickCheck
 import Test.QuickCheck.Checkers
 import Test.QuickCheck.Classes
+import Control.Applicative (ZipList)
 
 data Bull = Fools | Twoo
             deriving (Eq,Show)
@@ -51,7 +52,44 @@ instance Arbitrary a => Arbitrary (List a) where
 instance Eq a => EqProp (List a) where 
   (=-=) = eq
 
+newtype ZipList' a = ZipList' (List a)
+                     deriving (Eq, Show) 
+instance Eq a => EqProp (ZipList' a) where
+  xs =-= ys = xs' `eq` ys'
+    where xs' = let (ZipList' l) = xs
+                in take' 3000 l
+          ys' = let (ZipList' l) = ys
+                in take' 3000 l
+instance Functor ZipList' where
+  fmap f (ZipList' xs) = ZipList' $ fmap f xs
+instance Applicative ZipList' where
+  pure a = ZipList' $ pure a
+  (<*>) (ZipList' fs) (ZipList' as) =
+    ZipList' $ internal  fs as
+    where internal :: List (a -> b) -> List a -> List b
+          internal Nil _ = Nil
+          internal _ Nil = Nil
+          internal (Cons f Nil) (Cons b bs) = Cons (f b) (f <$> bs)
+          internal (Cons f fs) bs@(Cons b Nil) = Cons (f b) (fs <*> bs)
+          internal (Cons f fs) (Cons b bs) = Cons (f b) (internal fs bs)  
+instance Arbitrary a => Arbitrary (ZipList' a) where
+  arbitrary = ZipList' <$> arbitrary
+instance Semigroup a => Semigroup (ZipList' a) where
+  (<>) a (ZipList' Nil) = a
+  (<>) (ZipList' Nil) a = a
+  (<>) (ZipList' (Cons a as)) (ZipList' (Cons b bs)) =
+    ZipList' $ Cons (a<>b) (as<>bs)
+
+
+-- ZipList Applicative Exercise
+take' :: Int -> List a -> List a
+take' _ Nil = Nil
+take' 0 _ = Nil
+take' n (Cons x xs) = Cons x (take' (n-1) xs) 
+
+
 main :: IO ()
 main = do
   quickBatch (monoid Twoo)
   quickBatch (applicative (Cons (True,True,True) Nil))
+  quickBatch (applicative (ZipList' (Cons (True,True,True) Nil)))
