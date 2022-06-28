@@ -94,3 +94,15 @@ fix2 :: Maybe (Integer, Integer, [Char], [Integer])
 fix2 = (,,,) <$> Just 90 <*> Just 10 
       <*> Just "Tierness" <*> Just [1,2,3]
 
+-- Exercises
+-- Combinations
+stops :: String
+stops = "pbtdkg"
+
+vowels :: String
+vowels = "aeiou"
+
+combos :: [a] -> [b] -> [c] -> [(a,b,c)]
+combos = liftA3 helper
+  where helper :: a -> b -> c -> (a,b,c)
+        helper a b c = (a,b,c)
