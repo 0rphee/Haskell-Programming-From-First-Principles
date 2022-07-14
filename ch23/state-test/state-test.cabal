@@ -17,8 +17,11 @@ library
   hs-source-dirs:      src
   exposed-modules:     RandomExample
                      , RandomExample2
+                     , Fizzbuzz
+                     , ChapterExercises
   build-depends:       base >= 4.7 && < 5
                      , random
                      , transformers
+                     , dlist
   default-language:    Haskell2010
 
