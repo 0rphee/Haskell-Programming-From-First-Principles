@@ -1,0 +1,22 @@
+name:                parser-tests
+version:             0.1.0.0
+-- synopsis:
+-- description:
+homepage:            https://github.com/githubuser/parser-tests#readme
+license:             MIT
+license-file:        LICENSE
+author:              Author name here
+maintainer:          example@example.com
+copyright:           2022 Author name here
+category:            Web
+build-type:          Simple
+cabal-version:       >=1.10
+extra-source-files:  README.md
+
+library
+  hs-source-dirs:      src
+  exposed-modules:     LearnParsers
+                     , Text.Fractions
+  default-language:    Haskell2010
+  build-depends:       base >= 4.7 && < 5
+                     , trifecta
