@@ -176,8 +176,10 @@ mainINI = hspec $ do
       print m
       r' `shouldBe` expected'
 
-
-
+p' :: Parser [Integer]
+p' = some $ do
+  i <- token (some digit)
+  return (read i) 
 
 
 
