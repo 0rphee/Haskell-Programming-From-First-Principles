@@ -9,6 +9,7 @@ import Data.ByteString.Lazy (ByteString)
 import qualified Data.Text as T
 import Data.Text (Text)
 import Text.RawString.QQ
+import Data.Scientific (floatingOrInteger)
 
 sectionJson :: ByteString
 sectionJson = [r|
@@ -49,11 +50,27 @@ instance FromJSON Color where
   parseJSON _ = fail "Expected an object for Color"
 
 mainJson = do
-  let d = decode sectionJson :: Maybe TestData
-  print d
+  print $ dec "blah"
+  print $ eitherDec "blah"
 
+data NumbOrString = Numba Integer
+                  | Stringy Text
+                  deriving (Eq, Show)
 
+instance FromJSON NumbOrString where
+  parseJSON (Number i) = 
+    case floatingOrInteger i of
+      (Left _) -> fail "Must be integral number"
+      (Right int) -> return $ Numba int
+  parseJSON (String s) = return $ Stringy s
+  parseJSON _ = fail "NumbOrString must\
+                     \ be number or string"
+                    
+dec :: ByteString 
+    -> Maybe NumbOrString
+dec = decode
 
-
-
+eitherDec :: ByteString
+          -> Either String NumbOrString
+eitherDec = eitherDecode
 
